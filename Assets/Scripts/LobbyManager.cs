@@ -9,23 +9,15 @@ public class LobbyManager : MonoBehaviour
 {
     [Header("UI References")]
     [SerializeField] private Transform sessionListContainer; // Scroll View > Viewport > Content
-    [SerializeField] private GameObject sessionButtonPrefab; // Button prefab
-    [SerializeField] private InputField sessionNameInput;    // InputField
+    [SerializeField] private GameObject sessionButtonPrefab;
+    [SerializeField] private InputField sessionNameInput;
     [SerializeField] private string gameSceneName = "GameScene";
-
-    // ---------------------------------------------------------------
-    // Lifecycle
-    // ---------------------------------------------------------------
 
     private async void Start()
     {
         await NetworkManager.Singleton.GetComponent<UGSInit>().InitTask;
         await RefreshSessionList();
     }
-
-    // ---------------------------------------------------------------
-    // Button callbacks
-    // ---------------------------------------------------------------
 
     public async void OnCreateClicked()
     {
@@ -41,10 +33,6 @@ public class LobbyManager : MonoBehaviour
         await RefreshSessionList();
     }
 
-    // ---------------------------------------------------------------
-    // Core session logic
-    // ---------------------------------------------------------------
-
     private async Task CreateSession(string sessionName)
     {
         var options = new SessionOptions
@@ -58,9 +46,8 @@ public class LobbyManager : MonoBehaviour
         {
             ISession session = await MultiplayerService.Instance.CreateSessionAsync(options);
             Debug.Log($"Session created: {session.Id}  Code: {session.Code}");
-
-            NetworkManager.Singleton.SceneManager.LoadScene(
-                gameSceneName, LoadSceneMode.Single);
+            SessionHolder.Session = session;
+            NetworkManager.Singleton.SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
         }
         catch (SessionException e)
         {
@@ -74,6 +61,7 @@ public class LobbyManager : MonoBehaviour
         {
             ISession session = await MultiplayerService.Instance.JoinSessionByIdAsync(sessionId);
             Debug.Log($"Joined session: {session.Id}");
+            SessionHolder.Session = session;
         }
         catch (SessionException e)
         {
