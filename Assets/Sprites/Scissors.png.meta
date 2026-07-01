@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 0e992594b0b847a4db047c970750ecf6
+guid: 34e4ad2afbaf1ee42b4451d03aedd5b5
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -116,10 +116,10 @@ TextureImporter:
       name: Scissors_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 2
-        width: 57
-        height: 59
+        x: 1
+        y: 15
+        width: 62
+        height: 33
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

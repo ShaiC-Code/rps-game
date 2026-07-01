@@ -84,7 +84,7 @@ public class GameManager : NetworkBehaviour
         switch (state)
         {
             case ResultState.None:
-                resultText.text = "";
+                resultText.text = "Selected:";
                 break;
 
             case ResultState.Tie:
