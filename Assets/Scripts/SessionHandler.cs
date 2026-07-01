@@ -10,19 +10,16 @@ public class SessionHandler : MonoBehaviour
     [SerializeField] private Text resultText;
     [SerializeField] private string lobbySceneName = "LobbySelect";
 
-    private void Start()
+    private bool _isLeavingIntentionally = false;
+
+    private async void Start()
     {
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
-        if (SessionHolder.Session != null)
-        {
-            Debug.Log("Subscribing to RemovedFromSession");
-            SessionHolder.Session.RemovedFromSession += OnRemovedFromSession;
-        }
-        else
-        {
-            Debug.LogError("SessionHolder.Session is null in Start — events won't fire");
-        }
+        await SessionHolder.SessionReady;
+
+        Debug.Log("Subscribing to RemovedFromSession");
+        SessionHolder.Session.RemovedFromSession += OnRemovedFromSession;
     }
 
     private void OnDestroy()
@@ -50,6 +47,8 @@ public class SessionHandler : MonoBehaviour
 
     public async void LeaveSession()
     {
+        _isLeavingIntentionally = true;
+
         if (SessionHolder.Session != null)
         {
             if (NetworkManager.Singleton.IsServer)
@@ -76,15 +75,15 @@ public class SessionHandler : MonoBehaviour
 
     private async void OnClientDisconnected(ulong clientId)
     {
-        Debug.Log($"OnClientDisconnected fired. clientId={clientId} ServerClientId={NetworkManager.ServerClientId} IsServer={NetworkManager.Singleton.IsServer}");
+        Debug.Log($"OnClientDisconnected fired. clientId={clientId} IsServer={NetworkManager.Singleton.IsServer}");
 
-        if (!NetworkManager.Singleton.IsServer)
+        if (!NetworkManager.Singleton.IsServer && !_isLeavingIntentionally)
         {
             Debug.Log("Host disconnect detected on client — redirecting");
             if (resultText != null)
                 resultText.text = "Host left the session.";
 
-            await Task.Delay(2000);
+            await Task.Delay(3000);
 
             SessionHolder.Session = null;
             SceneManager.LoadScene(lobbySceneName);

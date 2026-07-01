@@ -29,6 +29,11 @@ public class PlayerManager : NetworkBehaviour
         _readyTcs.TrySetResult(true);
     }
 
+    public override void OnNetworkDespawn()
+    {
+        _readyTcs = new TaskCompletionSource<bool>();
+    }
+
     public void RegisterPlayer(Player player)
     {
         if (!player1Ref.Value.TryGet(out Player _))

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.UI;
@@ -127,21 +128,24 @@ public class GameManager : NetworkBehaviour
     public void SelectScissors() => Select(SelectedOption.Scissors, scissorsImage);
     public void ResetSelection() => Select(SelectedOption.None, null);
 
-    public void DetermineWinner()
+    public async void DetermineWinner()
     {
         if (!IsServer) return;
 
+        while (!PlayerManager.Instance.TryGetPlayer1(out _) || !PlayerManager.Instance.TryGetPlayer2(out _))
+        {
+            await Task.Yield();
+        }
+
         if (!PlayerManager.Instance.TryGetPlayer1(out Player player1) ||
             !PlayerManager.Instance.TryGetPlayer2(out Player player2))
-        {
-            Debug.Log("Cannot determine winner: One or both players are not registered.");
             return;
-        }
 
         SelectedOption option1 = player1.selectedOption.Value;
         SelectedOption option2 = player2.selectedOption.Value;
 
         Debug.Log($"Player1 selected: {option1}, Player2 selected: {option2}");
+
         if (option1 == SelectedOption.None || option2 == SelectedOption.None)
             return;
 
